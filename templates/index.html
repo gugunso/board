@@ -109,11 +109,11 @@
                             <div class="card-body">
                                 {% if '---' in post %}
                                     {% set content_parts = post.split('---') %}
-                                    <p class="card-text mb-2">{{ content_parts[0] }}</p>
-                                    <div class="post-info" style="color: #95a5a6; font-size: 0.85rem;">
-                                        {% for line in content_parts[1].strip().split('\n') %}
-                                            <div>{{ line }}</div>
-                                        {% endfor %}
+                                    <div class="post-content">
+                                        <p class="card-text mb-2">{{ content_parts[0] }}</p>
+                                        <div class="post-info" style="color: #95a5a6; font-size: 0.85rem;">
+                                            {{ content_parts[1].strip() }}
+                                        </div>
                                     </div>
                                 {% else %}
                                     <p class="card-text mb-2">{{ post }}</p>

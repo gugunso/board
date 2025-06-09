@@ -59,7 +59,7 @@ def save_post(content):
     ip_info = get_ip_info(ip_address)
     
     # 画面表示用の情報（シンプル版）
-    display_info = f"\n---\n投稿日時: {timestamp}\nUA: {user_agent}"
+    display_info = f"\n---\n{timestamp}"
     
     # メール送信用の詳細情報
     email_content = f"新しい投稿がありました\n\n"
