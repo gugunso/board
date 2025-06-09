@@ -49,7 +49,7 @@ def save_post(content):
     # 基本情報を取得
     ip_address = request.remote_addr
     user_agent = request.headers.get('User-Agent', 'Unknown')
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M')
     
     # 追加のヘッダー情報を取得
     referer = request.headers.get('Referer', 'Unknown')
@@ -59,7 +59,7 @@ def save_post(content):
     ip_info = get_ip_info(ip_address)
     
     # 画面表示用の情報（シンプル版）
-    display_info = f"\n---\n{timestamp}"
+    display_info = f"（{timestamp}）"
     
     # メール送信用の詳細情報
     email_content = f"新しい投稿がありました\n\n"
@@ -79,6 +79,8 @@ def save_post(content):
         email_content += f"プロバイダ: {ip_info['org']}\n"
         email_content += f"タイムゾーン: {ip_info['timezone']}\n"
         email_content += f"緯度経度: {ip_info['loc']}\n"
+    
+    email_content += f"\nアプリURL: https://board-production-acb1.up.railway.app/\n"
     
     # ファイルには画面表示用の情報のみ保存
     with open(DATA_FILE, 'a', encoding='utf-8') as f:
