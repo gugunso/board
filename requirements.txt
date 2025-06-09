@@ -1,1 +1,2 @@
 Flask==2.3.3
+Flask-HTTPAuth==4.8.0

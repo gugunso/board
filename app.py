@@ -1,9 +1,20 @@
 from flask import Flask, request, render_template, redirect
+from flask_httpauth import HTTPBasicAuth
 import os
 import smtplib
 from email.mime.text import MIMEText
 
 app = Flask(__name__)
+auth = HTTPBasicAuth()
+
+# Basic認証の設定
+USERNAME = os.environ.get('BASIC_AUTH_USERNAME', 'admin')
+PASSWORD = os.environ.get('BASIC_AUTH_PASSWORD', 'password')
+
+@auth.verify_password
+def verify_password(username, password):
+    return username == USERNAME and password == PASSWORD
+
 DATA_FILE = 'posts.txt'
 
 # メール設定：環境変数から取得
@@ -42,6 +53,7 @@ def send_email(content):
         server.send_message(msg)
 
 @app.route('/', methods=['GET', 'POST'])
+@auth.login_required
 def index():
     if request.method == 'POST':
         content = request.form.get('content', '').strip()
