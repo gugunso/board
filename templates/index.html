@@ -77,7 +77,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark mb-4">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-comments me-2"></i>
+                <i class="fas fa-comments me-2"></i>ゆうご、お父さんだよ！
             </a>
         </div>
     </nav>
@@ -133,48 +133,42 @@
             const form = document.querySelector('form');
             const submitButton = form.querySelector('button[type="submit"]');
             
+            // 位置情報を事前に取得
+            let locationData = null;
+            
+            // ページ読み込み時に位置情報の取得を開始
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        locationData = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy
+                        };
+                    },
+                    function(error) {
+                        console.log('位置情報の取得に失敗しました:', error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+            }
+            
             form.addEventListener('submit', function(e) {
-                e.preventDefault(); // フォームのデフォルト送信を防止
-                
                 // 送信ボタンを無効化
                 submitButton.disabled = true;
-                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>位置情報取得中...';
-
-                // 位置情報を取得
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        function(position) {
-                            // 位置情報をフォームに追加
-                            const locationInput = document.createElement('input');
-                            locationInput.type = 'hidden';
-                            locationInput.name = 'location';
-                            locationInput.value = JSON.stringify({
-                                latitude: position.coords.latitude,
-                                longitude: position.coords.longitude,
-                                accuracy: position.coords.accuracy
-                            });
-                            form.appendChild(locationInput);
-                            
-                            // フォームを送信
-                            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>送信中...';
-                            form.submit();
-                        },
-                        function(error) {
-                            console.log('位置情報の取得に失敗しました:', error);
-                            // 位置情報が取得できなくてもフォームを送信
-                            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>送信中...';
-                            form.submit();
-                        },
-                        {
-                            enableHighAccuracy: true,
-                            timeout: 5000,
-                            maximumAge: 0
-                        }
-                    );
-                } else {
-                    // 位置情報APIが利用できない場合は通常送信
-                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>送信中...';
-                    form.submit();
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>送信中...';
+                
+                // 位置情報がある場合は追加
+                if (locationData) {
+                    const locationInput = document.createElement('input');
+                    locationInput.type = 'hidden';
+                    locationInput.name = 'location';
+                    locationInput.value = JSON.stringify(locationData);
+                    form.appendChild(locationInput);
                 }
             });
         });
