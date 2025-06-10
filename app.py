@@ -44,10 +44,19 @@ def get_ip_info(ip_address):
         print(f"Error fetching IP info: {e}")
     return None
 
+def get_client_ip():
+    # X-Forwarded-Forヘッダーを確認
+    x_forwarded_for = request.headers.get('X-Forwarded-For')
+    if x_forwarded_for:
+        # カンマ区切りの最初のIPを取得
+        return x_forwarded_for.split(',')[0].strip()
+    # フォールバックとしてremote_addrを使用
+    return request.remote_addr
+
 # 投稿をファイルに保存
 def save_post(content):
     # 基本情報を取得
-    ip_address = request.remote_addr
+    ip_address = get_client_ip()
     user_agent = request.headers.get('User-Agent', 'Unknown')
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M')
     
