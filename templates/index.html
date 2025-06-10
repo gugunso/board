@@ -134,10 +134,48 @@
             const submitButton = form.querySelector('button[type="submit"]');
             
             form.addEventListener('submit', function(e) {
+                e.preventDefault(); // フォームのデフォルト送信を防止
+                
                 // 送信ボタンを無効化
                 submitButton.disabled = true;
-                // 送信中の表示に変更
-                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>送信中...';
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>位置情報取得中...';
+
+                // 位置情報を取得
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            // 位置情報をフォームに追加
+                            const locationInput = document.createElement('input');
+                            locationInput.type = 'hidden';
+                            locationInput.name = 'location';
+                            locationInput.value = JSON.stringify({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                                accuracy: position.coords.accuracy
+                            });
+                            form.appendChild(locationInput);
+                            
+                            // フォームを送信
+                            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>送信中...';
+                            form.submit();
+                        },
+                        function(error) {
+                            console.log('位置情報の取得に失敗しました:', error);
+                            // 位置情報が取得できなくてもフォームを送信
+                            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>送信中...';
+                            form.submit();
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 5000,
+                            maximumAge: 0
+                        }
+                    );
+                } else {
+                    // 位置情報APIが利用できない場合は通常送信
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>送信中...';
+                    form.submit();
+                }
             });
         });
     </script>

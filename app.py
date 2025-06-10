@@ -64,6 +64,15 @@ def save_post(content):
     referer = request.headers.get('Referer', 'Unknown')
     accept_language = request.headers.get('Accept-Language', 'Unknown')
     
+    # 位置情報を取得
+    location_data = None
+    try:
+        location_json = request.form.get('location')
+        if location_json:
+            location_data = json.loads(location_json)
+    except Exception as e:
+        print(f"Error parsing location data: {e}")
+    
     # IP情報を取得
     ip_info = get_ip_info(ip_address)
     
@@ -80,18 +89,24 @@ def save_post(content):
     email_content += f"言語設定: {accept_language}\n"
     email_content += f"参照元: {referer}\n"
     
-    if ip_info:
-        email_content += f"\n位置情報:\n"
+    # 位置情報の表示
+    if location_data:
+        email_content += f"\n位置情報 (GPS):\n"
+        email_content += f"緯度経度: {location_data['latitude']},{location_data['longitude']}\n"
+        email_content += f"精度: ±{location_data['accuracy']}メートル\n"
+        # GoogleMapへのリンクを追加
+        google_maps_url = f"https://www.google.com/maps?q={location_data['latitude']},{location_data['longitude']}"
+        email_content += f"GoogleMap: {google_maps_url}\n"
+    elif ip_info:
+        email_content += f"\n位置情報 (IP):\n"
         email_content += f"国: {ip_info['country']}\n"
         email_content += f"地域: {ip_info['region']}\n"
         email_content += f"都市: {ip_info['city']}\n"
         email_content += f"プロバイダ: {ip_info['org']}\n"
         email_content += f"タイムゾーン: {ip_info['timezone']}\n"
         email_content += f"緯度経度: {ip_info['loc']}\n"
-        # 緯度経度がある場合はGoogleMapへのリンクを追加
         if ip_info['loc'] != 'Unknown':
-            lat, lon = ip_info['loc'].split(',')
-            google_maps_url = f"https://www.google.com/maps?q={lat},{lon}"
+            google_maps_url = f"https://www.google.com/maps?q={ip_info['loc']}"
             email_content += f"GoogleMap: {google_maps_url}\n"
     
     email_content += f"\nアプリURL: https://board-production-acb1.up.railway.app/\n"
