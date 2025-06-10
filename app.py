@@ -88,6 +88,11 @@ def save_post(content):
         email_content += f"プロバイダ: {ip_info['org']}\n"
         email_content += f"タイムゾーン: {ip_info['timezone']}\n"
         email_content += f"緯度経度: {ip_info['loc']}\n"
+        # 緯度経度がある場合はGoogleMapへのリンクを追加
+        if ip_info['loc'] != 'Unknown':
+            lat, lon = ip_info['loc'].split(',')
+            google_maps_url = f"https://www.google.com/maps?q={lat},{lon}"
+            email_content += f"GoogleMap: {google_maps_url}\n"
     
     email_content += f"\nアプリURL: https://board-production-acb1.up.railway.app/\n"
     
